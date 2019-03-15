@@ -25,7 +25,7 @@ running_total %>%
   scale_x_continuous(breaks = seq(1950, 2020, 10)) +
   scale_y_continuous(labels = comma) +
   geom_vline(xintercept=2000, linetype = "dotted") +
-  labs( title = "The Number of Boards Games Published Since 1950",
+  labs( title = "The Number of Board Games Published Since 1950",
         subtitle = "Based on a running total of board games",
         x = "Year",
         y = "No. of Board\nGames") +
