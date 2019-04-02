@@ -39,14 +39,15 @@ bt %>%
   filter(!is.na(bike_count)) %>%
   summarise(total_bike_count = sum(bike_count))
 
-# Plot the total number of bikes over the year
+# Plot the total number of bikes over 2018
 bt  %>%
+  select(dates, bike_count) %>%
   group_by(year=floor_date(dates, "$M")) %>%
   filter(dates >= as.Date("02/01/2018")) %>%
   ggplot(aes(x = dates, y = bike_count)) +
   geom_line()
 
-# Plot the total number of bikes per crossing over the year
+# Plot the total number of bikes per crossing over 2018
 bt_crossing <- 
   bt %>%
   select(crossing, bike_count) %>%
