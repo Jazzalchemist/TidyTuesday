@@ -3,9 +3,6 @@
 library(tidyverse)
 library(scales)
 library(lubridate)
-library(extrafont)
-font_import()
-loadfonts(device = "win")
 
 # Import data and tidy dates
 bt <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-04-02/bike_traffic.csv",
