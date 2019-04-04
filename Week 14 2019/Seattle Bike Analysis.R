@@ -1,71 +1,93 @@
 
-## 1. SET UP
-
 # Load packages
 library(tidyverse)
+library(scales)
 library(lubridate)
+library(extrafont)
+font_import()
+loadfonts(device = "win")
 
-# Import data
-bt <- read.csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-04-02/bike_traffic.csv")
-
-
-## 2. EXPLORE DATA
+# Import data and tidy dates
+bt <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-04-02/bike_traffic.csv",
+               col_types = "cccdd") %>% 
+  mutate(date = mdy_hms(date))
 
 # Glimpse data
 glimpse(bt)
 
-# Sum the total number of bikes in the dataset
-sum(bt$bike_count,na.rm=TRUE)
-
-# Check the latest date in the dataset
-max(bt$date)
-
-
-## 3. TIDY DATE COLUMN
-
-# Convert time in 'date' to 24 hours. Separate 'date' into time and date columns
-bt$date <- mdy_hms(bt$date)
-bt$dates <- as.Date(bt$date,"%m/%d/%Y")
-bt$time <- as.POSIXct(bt$date, "%m/%d/%Y %H:%M:%S", tz = "")
-
-
-## 4. INVESTIGATE TOTAL BIKES OVER A ONE YEAR PERIOD
-
-# Sum the total number of bikes per year
-bt %>%
-  select(dates, bike_count) %>%
-  group_by(year=floor_date(dates, "$Y")) %>%
-  arrange(dates) %>%
-  filter(!is.na(bike_count)) %>%
-  summarise(total_bike_count = sum(bike_count))
-
-# Plot the total number of bikes over 2018
+# Plot the total number of bikes by month
 bt  %>%
-  select(dates, bike_count) %>%
-  group_by(year=floor_date(dates, "$M")) %>%
-  filter(dates >= as.Date("02/01/2018")) %>%
-  ggplot(aes(x = dates, y = bike_count)) +
-  geom_line()
-
-# Plot the total number of bikes per crossing over 2018
-bt_crossing <- 
-  bt %>%
-  select(crossing, bike_count) %>%
-  group_by(crossing) %>%
+  select(date, bike_count) %>%
   filter(!is.na(bike_count)) %>%
-  summarise(total_bikes = sum(bike_count))
+  mutate(month = as.Date(floor_date(date, "month"))) %>%
+  group_by(month) %>%
+  summarise(total_bike_count = sum(bike_count)) %>%
+  ggplot(aes(x = month, y = total_bike_count/1000)) +
+  geom_line(color = 'springgreen4') +
+  geom_area(fill = 'springgreen3', alpha = .1) +
+  scale_x_date(labels = date_format("%b %Y"), 
+               name = "Month", 
+               date_breaks = "6 months") +
+  theme_classic() +
+  labs(y = "Bike Count (Thousands)",
+       title = "Seattle Monthly Bike Traffic",
+       subtitle = "December 2013 - February 2019",
+       caption = "Data source: Seattle Department of Transportation | By @JaredBraggins") +
+  theme(plot.title=element_text(size=20,face="bold"),
+        plot.subtitle=element_text(face="italic",size=14),
+        axis.text = element_text(size = 12),
+        text=element_text(size=12,  family="Century Gothic"),
+        panel.grid.major.y = element_line(size = .1, color = "gray90"))
 
-bt_crossing %>%
-  ggplot(aes(x = crossing, y = total_bikes)) +
-  geom_col() +
-  theme_classic()+
-  coord_flip()
 
+# Save image of monthly chart
+ggsave(
+  filename = 'Seattle_Monthly_Bike.png',
+  height = 20,
+  width = 29,
+  units = 'cm',
+  dpi = 'retina'
+)
 
-## 5. INVESTIGATE AVERAGE NUMBER OF BIKES
+# Plot bike traffic per stop for each year
+bt  %>%
+  select(date, bike_count, crossing) %>%
+  filter(!is.na(bike_count)) %>%
+  mutate(month = as.Date(floor_date(date, "month"))) %>%
+  group_by(month, crossing) %>%
+  summarise(total_bike_count = sum(bike_count)) %>%
+  ungroup() %>%
+  ggplot(aes(x = month, y = total_bike_count/1000, color = as.factor(crossing))) +
+  geom_line(size = 0.75) +
+  scale_x_date(labels = date_format("%b %Y"), 
+               name = "Month", 
+               date_breaks = "6 months") +
+  scale_color_manual(values=c("#D3D3D3", "#D3D3D3", "#008080", "#D3D3D3",
+                              "#D3D3D3", "#D3D3D3", 
+                              "#D3D3D3")) +
+  theme_classic() +
+  annotate("text", 
+           x = as.Date("2013-12-25"), 
+           y = 65, 
+           label = "The Burke Gilman Trail saw the most bike traffic\nover Summer each year",
+           hjust = 0, size = 5, family = "Century Gothic", color = '#008080') +
+  labs(y = "Bike Count (Thousands)",
+       title = "Seattle Monthly Bike Traffic By Crossing",
+       subtitle = "December 2013 - February 2019",
+       caption = "Data source: Seattle Department of Transportation | By @JaredBraggins") +
+  theme(plot.title=element_text(size=20,face="bold"),
+        plot.subtitle=element_text(face="italic",size=14),
+        legend.position="none",
+        legend.title = element_blank(),
+        axis.text = element_text(size = 12),
+        text=element_text(size=12,  family="Century Gothic"),
+        panel.grid.major.y = element_line(size = .1, color = "gray90"))
 
-# Plot the average number of bikes per day
-
-
-# Plot peak times for cyclists
-
+# Save image of monthly crossing chart
+ggsave(
+  filename = 'Seattle_Monthly_Crossing.png',
+  height = 20,
+  width = 29,
+  units = 'cm',
+  dpi = 'retina'
+)
