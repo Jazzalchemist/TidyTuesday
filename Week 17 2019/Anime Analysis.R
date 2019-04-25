@@ -1,11 +1,10 @@
-
 # Load packages
 library(tidyverse)
 library(gganimate)
 library(lubridate)
 
 # Import data
-anime <- read.csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-04-23/tidy_anime.csv") %>% 
+anime <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-04-23/tidy_anime.csv") %>% 
   mutate(start_date = ymd(as.character(start_date))) %>% 
   mutate(start_year = year(start_date))
 
@@ -36,8 +35,10 @@ anime_filtered %>%
 
 # Create loop to assign rank per year for all shows
 for (i in 1998:2018) {
-  anime_filtered %>%
+  anime_temp <- anime_filtered %>%
     top_n(20, score)
+  anime_filtered <- anime_filtered %>% 
+    bind_rows(anime_temp)
 }
 
 # Add frame ids for transitions
@@ -48,14 +49,16 @@ anime_final <- anime_filtered %>%
 anime_final
 
 # Plot top 20 where shows began airing from 1998 to see where Cowboy Bebop places
+
+
 anime_race <- 
   anime_final %>% 
   top_n(20, score) %>% 
   mutate(title_english = fct_reorder(title_english, score)) %>% 
   ggplot(aes(x = title_english, y = score)) +
   geom_col() +
-  coord_flip()
-  transition_states(frame_id, transition_length = 4, state_length = 3) +
+  coord_flip() +
+transition_states(frame_id, transition_length = 4, state_length = 3) +
   ease_aes('cubic-in-out')
 
 animate(anime_race, nframes = 750, fps = 25, end_pause = 50, width = 400, height = 266, res = 80, detail = 3)
