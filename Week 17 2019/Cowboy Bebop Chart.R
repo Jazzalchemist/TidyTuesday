@@ -1,11 +1,11 @@
 # Load packages
 library(tidyverse)
 library(lubridate)
-library(paletteer)
+library(stringr)
 
 
 # Import data
-anime <- read.csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-04-23/tidy_anime.csv") %>% 
+anime <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-04-23/tidy_anime.csv") %>% 
   mutate(start_date = ymd(as.character(start_date))) %>% 
   mutate(start_year = year(start_date))
 
@@ -22,35 +22,62 @@ anime_filtered <-
            type == "TV" & 
            start_year == 1998 &
            !is.na(title_english)) %>% 
+  mutate(score = round(score, 1)) %>% 
   arrange(desc(score)) %>% 
   distinct(title_english, .keep_all = TRUE)
 
 
+# Wrap long title names
+anime_filtered$title_english = str_wrap(anime_filtered$title_english, width = 36)
+
+
 # Set formatting for chart
-my_font <- 'Quicksand'
-my_background <- 'antiquewhite'
-my_palette <- c('#F8AFA8','#74A089')
+my_font <- 'Bookman Old Style'
+my_background <- '#191919'
+my_palette <- c('#CCD0CF', '#EFCC77')
+my_titlecolour <- '#EFCC77'
+my_textcolour <- 'white'
+my_labelcolour <- 'black'
 my_theme <- theme(text = element_text(family = my_font),
                   rect = element_rect(fill = my_background),
                   plot.background = element_rect(fill = my_background, color = NA),
                   panel.background = element_rect(fill = my_background, color = NA),
                   panel.border = element_blank(),
-                  plot.title = element_text(face = 'bold', size = 20),
-                  plot.subtitle = element_text(size = 14),
+                  plot.title = element_text(face = 'bold', size = 14, colour = my_titlecolour),
+                  plot.subtitle = element_text(size = 12, colour = my_textcolour),
                   panel.grid.major.y = element_blank(),
                   panel.grid.minor.y = element_blank(),
-                  panel.grid.major.x = element_line(color = 'grey75'),
-                  panel.grid.minor.x = element_line(color = 'grey75'),
+                  panel.grid.major.x = element_blank(),
+                  panel.grid.minor.x = element_blank(),
                   legend.position = 'none',
-                  plot.caption = element_text(size = 8),
+                  plot.caption = element_text(size = 9, colour = my_textcolour),
                   axis.ticks = element_blank(),
-                  axis.text.y =  element_blank())
+                  axis.text.x = element_blank(),
+                  axis.text.y = element_text(size = 6, colour = my_textcolour))
 
 
-# Plot top 20 to see where Cowboy Bebop places
+theme_set(theme_light() + my_theme)
+
+# Plot top 10 to see where Cowboy Bebop places
 anime_filtered %>% 
-  top_n(20, score) %>% 
+  top_n(10, score) %>% 
   mutate(title_english = fct_reorder(title_english, score)) %>% 
-  ggplot(aes(x = title_english, y = score)) +
+  mutate(highlight_flag = ifelse(title_english == "Cowboy Bebop",T,F)) %>%
+  ggplot(aes(title_english, score, fill = highlight_flag)) +
   geom_col() +
-  coord_flip()
+  geom_text(aes(label=score), hjust = 1.5, color = my_labelcolour) +
+  scale_fill_manual(values = c(my_palette)) +
+  coord_flip() +
+  labs(title = "Cowboy Bebop Had the Highest Score",
+       subtitle = "Of the top ten shows that aired in 1998",
+       caption = "Data source: MyAnimeList",
+       y = "",
+       x = "")
+
+ggsave(
+  filename = 'CowboyBebop.png',
+  height = 8,
+  width = 15,
+  units = 'cm',
+  dpi = 'retina'
+)
