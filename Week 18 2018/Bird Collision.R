@@ -5,7 +5,6 @@ library(ggridges)
 
 # Import data
 bird_collisions <- read.csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-04-30/bird_collisions.csv") %>% 
-  mutate(date = ymd(as.character(date))) %>% 
   mutate(year = year(date))
 
 # Inspect data
