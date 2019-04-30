@@ -12,11 +12,11 @@ head(bird_collisions)
 
 
 # Set theme
-# my_font <- 'Sans Serif'
+my_font <- 'Century Gothic'
 my_background <- '#FFFAF0'
 my_textcolour <- "grey29"
 my_axiscolour <- "grey15" 
-my_theme <- theme(#text = element_text(family = my_font),
+my_theme <- theme(text = element_text(family = my_font),
                   rect = element_rect(fill = my_background),
                   plot.background = element_rect(fill = my_background, color = NA),
                   plot.title = element_text(face = 'bold', size = 16),
