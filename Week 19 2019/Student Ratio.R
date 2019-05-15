@@ -1,19 +1,24 @@
 # Load packages
 library(tidyverse)
+library(lubridate)
 library(extrafont)
 
-# Import data
-student_ratio <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-05-07/student_teacher_ratio.csv")
+
+getwd()
+# Load data
+nobel_winners <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-05-14/nobel_winners.csv") %>% 
+  mutate(birth_year = year(birth_date)) %>% 
+  mutate(birth_date = ymd(as.character(birth_date)))
 
 
-# Inspect data
-View(student_ratio)
+# View the data
+View(nobel_winners)
 
-# Group countries and calculate mean
-ratio_grouped <-student_ratio %>%
-  filter(indicator == "Tertiary Education") %>% 
-  group_by(country) %>%
-  mutate(mean = mean(student_ratio, na.rm = TRUE))
+
+# Summarise data
+nobel_filtered <- nobel_winners %>% 
+  count(birth_country, sort = TRUE) %>% 
+  filter(!is.na(birth_country))
 
 
 # Load world map
@@ -26,11 +31,11 @@ map_data('world') %>%
 
 
 # Join datasets
-country_join <- left_join(map.world, ratio_grouped, by = c('region' = 'country'))
+country_join <- left_join(map.world, nobel_filtered, by = c('region' = 'birth_country'))
 
 
 # Set theme
-my_background <- 'white'
+my_background <- 'grey89'
 my_textcolour <- "grey19"
 my_font <- 'Century Gothic'
 my_theme <- theme(text = element_text(family = my_font),
@@ -44,21 +49,46 @@ my_theme <- theme(text = element_text(family = my_font),
                   panel.grid.minor.y = element_blank(),
                   panel.grid.major.x = element_blank(),
                   panel.grid.minor.x = element_blank(),
-                  axis.text = element_blank())
+                  axis.text = element_blank(),
+                  legend.background = element_rect(fill = my_background),
+                  legend.key = element_rect(fill = my_background),
+                  legend.title.align = 1)
 
 theme_set(theme_light() + my_theme)
 
 
-# Plot map and save image
-ggplot(data = country_join, aes(x = long, y = lat, group = group)) +
-  geom_polygon(aes(fill = mean)) +
-  scale_fill_gradientn(colours = c('#F9E53F', '#7FD157','#2A8A8C','#404E88', '#461863', '#462255')) +
-  labs(title = "Student to Teacher Ratio in Tertiary Education",
-       subtitle = "2012 - 2018",
+# Plot map
+ggplot(country_join, aes( x = long, y = lat, group = group )) +
+  geom_polygon(aes(fill = n)) +
+  scale_fill_gradientn(colours = c('#9CDA3B','#24858C', '#31668E')) +
+  labs(title = "Nobel Prize Winners by Country of Origin",
+       subtitle = "1901 - 2016",
        x = "",
        y = "",
-       caption = "Visualisation: @JaredBraggins | Data Source: UNESCO Institute of Statistics") +
+       caption = "Visualisation: @JaredBraggins | Data Source: Harvard Dataverse") +
   guides(
-    fill = guide_legend(title = "Ratio"))
+    fill = guide_legend(title = "# of Winners"))
 
-ggsave('Student Ratios.png', device = "png", type = "cairo")
+ggsave('Nobel Map.png', device = "png", type = "cairo")
+
+# Calculate prize winners' age
+winner_age <- nobel_winners %>% 
+  select(full_name, birth_year, gender, prize_year, category) %>% 
+  mutate(age = as.numeric(prize_year - birth_year)) %>% 
+  filter(!is.na(birth_year))
+
+
+# Boxplot of prize winner age/gender
+winner_age %>% 
+  ggplot(aes(category, age, fill = gender)) +
+  geom_boxplot() +
+  scale_fill_manual(values = c('#D4855A', '#6C4E97')) +
+  labs(x = "Category", 
+       y = "Age",
+       title = "Nobel Prize Winners by Age and Gender",
+       caption = "Visualisation: @JaredBraggins | Data Source: Harvard Dataverse") +
+  theme(axis.line = element_line(colour = "black"),
+        axis.text = element_text(),
+        axis.ticks = element_line(colour = "black"))
+
+ggsave('Nobel Boxplot.png', device = "png", type = "cairo")
