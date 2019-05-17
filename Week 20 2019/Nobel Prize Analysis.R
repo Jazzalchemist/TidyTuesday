@@ -33,7 +33,6 @@ nobel_filtered <- nobel_filtered %>%
                                          "Serbia" = "Republic of Serbia",
                                          "Republic of Macedonia" = "Macedonia")))
 
-View(nobel_filtered)
 
 # Load world map
 map.world <- map_data('world') %>% 
