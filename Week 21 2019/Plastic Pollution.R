@@ -3,10 +3,8 @@ library(tidyverse)
 library(extrafont)
 library(paletteer)
 
-
 # Import data
 coast_vs_waste <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-05-21/coastal-population-vs-mismanaged-plastic.csv")
-
 
 # Rename columns, remove nulls and create waste per person
 colnames(coast_vs_waste)[1] <- c("Country")
@@ -16,22 +14,17 @@ colnames(coast_vs_waste)[6] <- c("Population")
 
 coast_filtered <- na.omit(coast_vs_waste) %>% 
   mutate(waste_per_person = (Mismanaged_Waste/Coastal_Population)*1000)
-
-      
+    
 # View data
 View(coast_filtered)
-
 
 # Update name for USA
 coast_filtered <- coast_filtered %>% 
   mutate(Country = str_replace_all(Country, c("United States" = "USA")))
 
-      
-
 # Load world map, filter out Antarctica
 map.world <- map_data('world') %>% 
   filter(region != "Antarctica")
-
 
 # Join datasets
 country_join <- left_join(map.world, coast_filtered, by = c('region' = 'Country'))
@@ -60,7 +53,6 @@ my_theme <- theme(text = element_text(family = my_font),
                   legend.title.align = 1)
 
 theme_set(theme_light() + my_theme)
-
 
 # Plot map
 ggplot(country_join, aes( x = long, y = lat)) +
