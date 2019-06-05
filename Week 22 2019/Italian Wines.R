@@ -24,9 +24,9 @@ mysubtitlecolour = "grey9"
 my_chartcolour <- "#800000"
 my_font <- 'Bodoni MT'
 my_theme <- theme(text = element_text(family = my_font),
-                  plot.title = element_text(face = 'bold', size = 20),
+                  plot.title = element_text(face = 'bold', size = 16),
                   plot.background = element_rect(fill = my_background),
-                  plot.subtitle = element_text(size = 16, colour = mysubtitlecolour),
+                  plot.subtitle = element_text(size = 14, colour = mysubtitlecolour),
                   plot.caption = element_text(size = 10, colour = mysubtitlecolour),
                   panel.background = element_rect(fill = my_background, colour = my_background),
                   panel.border = element_blank(),
@@ -47,14 +47,15 @@ theme_set(theme_light() + my_theme)
 top_variety %>% 
   mutate(variety = fct_reorder(variety, rating)) %>% 
   ggplot(aes(variety, rating, label = rating)) +
-  geom_segment(aes(y = 0, xend = variety, yend = rating)) +
+  geom_segment(aes(y = 80, xend = variety, yend = rating)) +
   geom_point(size = 9.5, colour = my_chartcolour) +
   geom_text(colour = "white", size = 3) +
   coord_flip() +
+  scale_y_continuous(limits = c(80,90)) +
   labs(title = "Top Rated Italian Red Wines",
        subtitle = "Based on average rating per variety",
        x = "",
        y = "",
        caption = "Visualisation: @JaredBraggins | Data Source: Kaggle")
 
-ggsave(file = "Italian Wines.png", height = 12, width = 18, units = "cm", device = "png")
+ggsave(file = "Italian Wines.png",  dpi = 600)
