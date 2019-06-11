@@ -5,7 +5,7 @@ library(extrafont)
 library(paletteer)
 
 # Import data
-ramen_ratings <- read.csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-06-04/ramen_ratings.csv")
+ramen_ratings <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-06-04/ramen_ratings.csv")
 
 # Inspect data
 View(ramen_ratings)
