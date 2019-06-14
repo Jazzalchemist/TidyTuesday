@@ -1,17 +1,16 @@
 # Load libraries
 library(tidyverse)
 library(extrafont)
-library(paletteer)
-library(ggthemes)
 library(gganimate)
 
 # Import data
-meteorites <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-06-11/meteorites.csv") 
+meteorites <- read.csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-06-11/meteorites.csv") 
 
 # Data wrangling
 anim <- meteorites %>% 
-  select(year, long, lat, mass) %>%
+  select(year, long, lat, mass, fall) %>%
   mutate(year = as.integer(year)) %>%
+  rename("Fall" = fall) %>% 
   filter(!is.na(lat),
          !is.na(long),
          !is.na(mass), 
@@ -38,14 +37,25 @@ map_theme <- theme(text = element_text(family = map_font),
                   panel.grid.minor.x = element_blank(),
                   axis.ticks = element_blank(),
                   axis.text = element_blank(),
-                  legend.position="none")
+                  legend.title = element_text(face = 'bold', size = 12, colour = map_textcolour),
+                  legend.text = element_text(size = 10, colour = map_textcolour),
+                  legend.title.align = 1,
+                  legend.direction="horizontal",
+                  legend.justification=c(1,0), 
+                  legend.position="top",
+                  legend.background = element_rect(fill = map_background),
+                  legend.key = element_rect(fill = map_background))
 
 theme_set(theme_light() + map_theme)
 
+pal <- c("Found" ="#69C6CD", "Fell" = "#D8986A")
+
 # Plot data
 p <- ggplot() + 
-  borders("world", colour = map_colour, fill = map_colour, alpha = 0.1) +
-  geom_point(data = anim, aes(x = long, y = lat, size = mass), colour = map_dot) +
+  borders("world", colour = map_colour, fill = map_colour, alpha = 0.05) +
+  geom_point(data = anim, aes(x = long, y = lat, colour = Fall, size = mass/1000)) +
+  scale_colour_manual(values = pal) +
+  scale_size_continuous(name = "Mass (kgs)") +
   labs(title = "Meteorite Landings",
        x = "",
        y = "",
@@ -56,10 +66,7 @@ p <- ggplot() +
   enter_fade() +
   exit_shrink() +
   ease_aes("linear") +
-  shadow_mark(colour = map_dot, alpha = 0.4)
-
-# Create animation
-animate(p, fps = 8, type = "cairo", width = 800, height = 500)
+  shadow_mark(colour = pal, alpha = 0.6)
 
 # Create GIF
-anim_save("meteorite_animated.gif", p, width = 800, height = 500)
+anim_save("meteorite_animated.gif", p, fps = 8, type = "cairo", width = 800, height = 500)
