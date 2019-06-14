@@ -52,7 +52,7 @@ pal <- c("Found" ="#69C6CD", "Fell" = "#D8986A")
 
 # Plot data
 p <- ggplot() + 
-  borders("world", colour = map_colour, fill = map_colour, alpha = 0.05) +
+  borders("world", colour = map_colour, fill = map_colour, alpha = 0.1) +
   geom_point(data = anim, aes(x = long, y = lat, colour = Fall, size = mass/1000)) +
   scale_colour_manual(values = pal) +
   scale_size_continuous(name = "Mass (kgs)") +
