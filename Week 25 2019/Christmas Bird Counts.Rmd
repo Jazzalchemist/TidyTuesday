@@ -1,8 +1,10 @@
 ---
 title: "Christmas Bird Counts"
-author: "Jared Braggins"
-date: "18 June 2019"
-output: html_document
+output: 
+  html_document:
+    theme: cosmo
+editor_options:
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -10,25 +12,21 @@ knitr::opts_chunk$set(echo = TRUE)
 options(stringsAsFactors = FALSE)
 ```
 
+```{r prep, message=FALSE, warning=FALSE, include=FALSE}
 # Load libraries
-
-```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
-library(paletteer)
 library(extrafont)
 ```
 
+``` {r, message=FALSE, warning=FALSE, include=FALSE}
 # Import data
-
-``` {r, message=FALSE, warning=FALSE}
 bird_counts <- read.csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-06-18/bird_counts.csv")
 ```
 
-
+```{r, include=FALSE}
 # Data wrangling
-```{r}
 bird_top <- bird_counts %>% 
-  filter(how_many_counted > 0) %>%
+  filter(how_many_counted > 0, year > 1950) %>%
   group_by(species) %>% 
   summarise(total=n(), total = sum(how_many_counted)) %>%
   top_n(n=10, total)
@@ -38,7 +36,7 @@ bird_top$species <- factor(bird_top$species) %>%
 bird_time <- bird_counts %>% 
   select(year, species, how_many_counted) %>% 
   group_by(species) %>% 
-  filter(how_many_counted > 0) %>% 
+  filter(how_many_counted > 0, year > 1950) %>% 
   ungroup()
 bird_time$species <- factor(bird_time$species, bird_top$species)
 
@@ -46,8 +44,7 @@ bird_filtered <- bird_time %>%
   filter(!is.na(species), species == "European Starling")
 ```
 
-# Set theme
-```{r}
+```{r, include=FALSE}
 my_font <- 'Century Gothic'
 my_background <- 'White'
 my_textcolour <- "grey19"
@@ -56,21 +53,60 @@ my_theme <- theme(text = element_text(family = my_font),
                   rect = element_rect(fill = my_background),
                   plot.background = element_rect(fill = my_background, color = NA),
                   plot.title = element_text(face = 'bold', size = 18),
-                  plot.subtitle = element_text(size = 14, colour = my_textcolour),
-                  plot.caption = element_text(size = 11, colour = my_textcolour),
+                  plot.subtitle = element_text(size = 14, colour = 'black'),
+                  plot.caption = element_text(size = 16, colour = my_textcolour),
                   panel.background = element_rect(fill = my_background, color = NA),
                   panel.border = element_blank(),
                   panel.grid.major.y = element_blank(),
+                  panel.grid.minor.y = element_blank(),
                   panel.grid.major.x = element_blank(),
                   panel.grid.minor.x = element_blank(),
                   axis.title = element_blank(),
                   axis.text.y = element_text(size = 12, colour= my_axiscolour),
-                  axis.text.x = element_blank(),
-                  axis.ticks = element_blank(),
+                  axis.text.x = element_text(size = 12, colour= my_axiscolour),
+                  axis.ticks = element_line(color = my_axiscolour),
                   axis.line = element_blank(),
                   legend.position="none")
 
 theme_set(theme_light() + my_theme)
 ```
 
+```{r, echo=FALSE, fig.width=12, fig.height = 5.3}
+# Plot top ten species
+bird_top %>% 
+  mutate(highlight_flag = ifelse(species == "European Starling",T,F)) %>%
+  ggplot(aes(species, total, fill = highlight_flag)) +
+  geom_col() +
+  geom_curve(aes(x = 7.5, y = 670000, xend = 9, yend = 520000),
+             arrow = arrow(length = unit(0.3, "cm")), size = 0.4,
+             color = "grey20", curvature = -0.3) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_fill_manual(values = c('grey65', 'skyblue4')) +
+  labs(title = "Top Ten Bird Species",
+       subtitle = "Sum of observations 1950 - 2017") +
+  coord_flip() +
+  theme(axis.ticks.y = element_blank()) +
+  annotate("text", x = 7.5, y = 700000, size = 5, hjust = 0, color = my_textcolour, family = my_font,
+           label = "The Eurpean Starling is\nthe most observed species")
+```
 
+&nbsp;
+
+```{r, echo=FALSE, fig.width=12, fig.height = 5.3}
+bird_time %>% 
+  filter(!is.na(species)) %>% 
+  ggplot() +
+  geom_line(aes(year, how_many_counted, group = species), colour = alpha("grey65", 0.8)) +
+  geom_line(aes(year, how_many_counted, group = species), size = 1, data = bird_filtered, color = 'skyblue4') +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_continuous(limits=c(1950, 2020)) +
+  geom_vline(xintercept=1980, linetype = "dotted", size = 0.6, color = 'black') +
+  geom_curve(aes(x = 1967, y = 70000, xend = 1979, yend = 75000),
+               arrow = arrow(length = unit(0.3, "cm")), size = 0.4,
+               color = "grey20", curvature = -0.3) +
+  labs(title = "Trend of Annual Obeservations for Top 10 Bird Species", 
+       caption = "\n\nVisualisation: @JaredBraggins | Data Source: Bird Studies Canada") +
+  annotate("text", x = 1950, y = 65000, size = 5, hjust = 0, color = my_textcolour, family = my_font,
+           label = "The highest number of observations for\nEuropean Starlings occurred in 1980")
+
+```
