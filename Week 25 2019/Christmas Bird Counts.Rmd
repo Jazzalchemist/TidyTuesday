@@ -15,6 +15,9 @@ options(stringsAsFactors = FALSE)
 ```{r prep, message=FALSE, warning=FALSE, include=FALSE}
 # Load libraries
 library(tidyverse)
+library(ggfittext)
+library(knitr)
+library(scales)
 library(extrafont)
 ```
 
@@ -72,27 +75,35 @@ theme_set(theme_light() + my_theme)
 ```
 
 ```{r, echo=FALSE, fig.width=12, fig.height = 5.3}
+# Load image
+img <- jpeg::readJPEG("M:/users/Jared/Training/R/Tidy Tuesday/Week 25 2019/Starling.jpg")
+rast <- grid::rasterGrob(img, interpolate = T)
+
 # Plot top ten species
 bird_top %>% 
   mutate(highlight_flag = ifelse(species == "European Starling",T,F)) %>%
-  ggplot(aes(species, total, fill = highlight_flag)) +
+  ggplot(aes(species, total, label=comma(total), fill = highlight_flag)) +
   geom_col() +
+  geom_bar_text(place = "right", contrast = TRUE) + 
   geom_curve(aes(x = 7.5, y = 670000, xend = 9, yend = 520000),
              arrow = arrow(length = unit(0.3, "cm")), size = 0.4,
              color = "grey20", curvature = -0.3) +
-  scale_y_continuous(labels = scales::comma) +
+  annotation_custom(rast, ymin = 830000, ymax = 1200000, xmin = -4) +
   scale_fill_manual(values = c('grey65', 'skyblue4')) +
   labs(title = "Top Ten Bird Species",
        subtitle = "Sum of observations 1950 - 2017") +
   coord_flip() +
-  theme(axis.ticks.y = element_blank()) +
+  theme(axis.ticks.x = element_blank(), 
+        axis.ticks.y = element_blank(),
+        axis.text.x = element_blank()) +
   annotate("text", x = 7.5, y = 700000, size = 5, hjust = 0, color = my_textcolour, family = my_font,
-           label = "The Eurpean Starling is\nthe most observed species")
+           label = "The European Starling is\nthe most observed species")
 ```
 
 &nbsp;
 
 ```{r, echo=FALSE, fig.width=12, fig.height = 5.3}
+# Plot top top ten species over time
 bird_time %>% 
   filter(!is.na(species)) %>% 
   ggplot() +
