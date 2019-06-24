@@ -23,7 +23,7 @@ library(extrafont)
 
 ``` {r, message=FALSE, warning=FALSE, include=FALSE}
 # Import data
-bird_counts <- read.csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-06-18/bird_counts.csv")
+bird_counts <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-06-18/bird_counts.csv")
 ```
 
 ```{r, include=FALSE}
