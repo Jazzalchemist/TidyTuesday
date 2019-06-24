@@ -76,7 +76,7 @@ theme_set(theme_light() + my_theme)
 
 ```{r, echo=FALSE, fig.width=12, fig.height = 5.3}
 # Load image
-img <- jpeg::readJPEG("M:/users/Jared/Training/R/Tidy Tuesday/Week 25 2019/Starling.jpg")
+img <- jpeg::readJPEG("Starling.jpg")
 rast <- grid::rasterGrob(img, interpolate = T)
 
 # Plot top ten species
