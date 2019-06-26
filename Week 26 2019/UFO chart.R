@@ -6,7 +6,6 @@ library(lubridate)
 library(scales)
 library(extrafont)
 
-
 # Import data
 ufo_sightings <- read.csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-06-25/ufo_sightings.csv")
 
@@ -18,7 +17,7 @@ ufo_sightings$date_time <- mdy_hm(as.character(ufo_sightings$date_time))
 ufo_sightings <- ufo_sightings %>% 
   mutate(year = year(date_time)) %>%
   filter(!is.na(latitude), !is.na(longitude))
-  
+
 ufo_area <- ufo_sightings %>% 
   group_by(year) %>% 
   summarise(total=n())
@@ -28,7 +27,7 @@ ufo_map <- ufo_sightings %>%
 
 # Set theme
 map_background <- 'black'
-map_colour <- "grey90"
+map_colour <- "white"
 map_textcolour <- "white"
 map_dot <- "#D8986A"
 map_font <- 'Century Gothic'
@@ -49,26 +48,20 @@ map_theme <- theme(text = element_text(family = map_font),
 
 theme_set(theme_light() + map_theme)
 
-image = "./ufo.png"
-
-# Plot sightings by shape over time
-ggplot(ufo_area, aes(year, total)) +
-  geom_area(fill = "white", colour = "white", alpha = 0.5) +
-  transition_reveal(year)
+image = "ufo.png"
 
 # Plot map
 p <- ggplot(ufo_map, aes(x = longitude, y = latitude)) + 
-  borders("world", colour = "white", fill = map_colour, alpha = 0.1) +
+  borders("world", colour = map_colour, fill = map_colour, alpha = 0.1) +
   geom_image(aes(image = image), size=.05) +
   labs(title = "UFO Sightings",
        caption = "Visualisation: @JaredBraggins | Data Source: NUFORC",
        subtitle = "{frame_time}") +
   transition_time(year) +
-  shadow_mark(past = TRUE) +
+  shadow_wake(wake_length = 0.1, alpha = FALSE) +
   enter_fade() +
   exit_shrink() +
   ease_aes("linear")
-
 
 # Create GIF
 anim_save("ufo.gif", p, fps = 8, type = "cairo", width = 800, height = 500)
