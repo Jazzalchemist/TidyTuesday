@@ -50,7 +50,7 @@ my_theme <- theme(text = element_text(family = my_font),
 theme_set(theme_light() + my_theme)
 
 # Load images
-img <- png::readPNG("M:/users/Jared/Training/R/Tidy Tuesday/Week 27 2019/RedFive_X-wing_SWB.png")
+img <- png::readPNG("RedFive_X-wing_SWB.png")
 rast <- grid::rasterGrob(img, interpolate = T)
 
 # Plot top five film franchises
