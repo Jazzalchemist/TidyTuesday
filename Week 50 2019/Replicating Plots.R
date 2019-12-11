@@ -1,5 +1,5 @@
 ## Tidy Tuesday Week 50 - Replicating Plots with R
-## Data Source: Open Data Philly
+## Data Source: Simply Statistics
 
 #Load packages
 library(tidyverse)
