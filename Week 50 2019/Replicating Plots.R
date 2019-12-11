@@ -3,10 +3,7 @@
 
 #Load packages
 library(tidyverse)
-library(ggridges)
 library(scales)
-library(patchwork)
-library(ggfittext)
 library(lubridate)
 library(extrafont)
 
