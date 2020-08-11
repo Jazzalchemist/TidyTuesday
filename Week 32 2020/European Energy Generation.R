@@ -72,27 +72,6 @@ plot_colour <- "white"
 renewable <- "#86BA90"
 nuclear <- "#CDCDCD"
 conventional <- "#CDCDCD"
-theme_style <- theme(text = element_text(family = font_family),
-                  rect = element_rect(fill = background),
-                  plot.background = element_rect(fill = background, color = NA),
-                  plot.title = element_text(face = 'bold', size = 16, colour = text_colour),
-                  plot.subtitle = element_text(size = 12, colour = text_colour),
-                  plot.caption = element_text(size = 13, colour = text_colour),
-                  panel.background = element_rect(fill = background, color = NA),
-                  panel.border = element_blank(),
-                  panel.grid.major.y = element_blank(),
-                  panel.grid.major.x = element_blank(),
-                  panel.grid.minor.x = element_blank(),
-                  axis.title = element_blank(),
-                  axis.text.x = element_blank(),
-                  axis.text.y = element_blank(),
-                  axis.ticks = element_blank(),
-                  axis.line = element_blank(),
-                  strip.text.x = element_text(size=12),
-                  strip.background = element_blank(),
-                  legend.position="none")
-
-theme_set(theme_classic() + theme_style)
 
 #Plot data
 p1 <- ggpie(energy_2016, "Percent", label = labs_2016,
