@@ -49,40 +49,41 @@ text_colour <- "white"
 axis_colour <- "white"
 plot_colour <- "#4B4C4E"
 theme_style <- theme(text = element_text(family = font_1),
-                  rect = element_rect(fill = background),
-                  plot.background = element_rect(fill = background, color = NA),
-                  plot.title = element_text(family = font_1, face = 'bold', hjust = -2, size = 26, colour = text_colour),
-                  plot.subtitle = element_text(family = font_2, size = 15, hjust = -.8, colour = text_colour),
-                  plot.caption = element_text(family = font_2, size = 10, colour = text_colour),
-                  panel.background = element_rect(fill = background, color = NA),
-                  panel.border = element_blank(),
-                  panel.grid.major.y = element_blank(),
-                  panel.grid.major.x = element_blank(),
-                  panel.grid.minor.x = element_blank(),
-                  axis.title.x = element_blank(),
-                  axis.text.x = element_text(family = font_2, size = 10, colour= text_colour),
-                  axis.title.y = element_text(family = font_2, size = 14, colour= text_colour),
-                  axis.text.y = element_text(family = font_2, size = 10, colour= text_colour),
-                  axis.ticks = element_blank(),
-                  axis.line.x = element_line(colour = axis_colour, size = .1),
-                  axis.line.y = element_blank(),
-                  legend.position="none",
-                  strip.text.x = element_text(family = font_1, size = 20, hjust = -.02, colour= text_colour),
-                  strip.placement = "outside",
-                  strip.background = element_blank())
+                     rect = element_rect(fill = background),
+                     plot.background = element_rect(fill = background, color = NA),
+                     plot.title = element_text(family = font_1, face = 'bold', hjust = -2.1, size = 26, colour = text_colour),
+                     plot.subtitle = element_text(family = font_2, size = 15, hjust = -.8, colour = text_colour),
+                     plot.caption = element_text(family = font_2, size = 10, colour = text_colour),
+                     plot.margin = unit(rep(1, 4), "cm"),
+                     panel.background = element_rect(fill = background, color = NA),
+                     panel.border = element_blank(),
+                     panel.grid.major.y = element_blank(),
+                     panel.grid.major.x = element_blank(),
+                     panel.grid.minor.x = element_blank(),
+                     axis.title.x = element_text(family = font_2, size = 14, colour= text_colour),
+                     axis.text.x = element_text(family = font_2, size = 10, colour= text_colour),
+                     axis.title.y = element_text(family = font_2, size = 14, colour= text_colour),
+                     axis.text.y = element_text(family = font_2, size = 8, colour= text_colour),
+                     axis.ticks = element_blank(),
+                     axis.line.x = element_line(colour = axis_colour, size = .1),
+                     axis.line.y = element_blank(),
+                     legend.position="none",
+                     strip.text.x = element_text(family = font_1, size = 20, hjust = -.02, colour= text_colour),
+                     strip.placement = "outside",
+                     strip.background = element_blank())
 
 theme_set(theme_classic() + theme_style)
 
 #Set palette
-cols <- c("Book One: Water" = "#2e67a0", 
-          "Book Two: Earth" = "#213A27", 
-          "Book Three: Fire" = "#A10000")
+cols <- c("Book One: Water" = "#4EA699", 
+          "Book Two: Earth" = "#AAD922", 
+          "Book Three: Fire" = "#F0803C")
 
 #Set custom y-axis labels
 yLabels <- paste(c(0,2.5,5,7.5,10), "")
 
 #Plot data
-ggplot(a_data_final) +
+p1 <- ggplot(a_data_final) +
   geom_segment(aes(chapter, xend=chapter, y=0, yend=Rating), size = 0.2, color = "gray") +
   geom_hline(aes(yintercept = Mean_Rating), linetype="dashed", colour = text_colour, size = .3) +
   geom_point(aes(chapter, y=Rating, colour = book), size=4) +
@@ -99,5 +100,21 @@ ggplot(a_data_final) +
        y = 'Rating')
 
 
+p2 <- ggplot(a_data_final, aes(x = Rating, y = chapter,colour = book)) +
+  geom_segment(aes(x = Mean_Rating, y = chapter, xend = Rating, yend = chapter)) +
+  geom_point() +
+  geom_vline(aes(xintercept = Mean_Rating), linetype="dashed", colour = text_colour, size = .3) +
+  geom_text(aes(Mean_Rating -0.3, vjust = -28, min(a_data_final$chapter_num), 
+                label = paste0("Average Rating: ",round(Mean_Rating, digits = 1)), family = font_2, size = 5),
+            colour = text_colour, size = 3, nudge_y = .3) +
+  scale_colour_manual(name = "book", values=cols) +
+  facet_wrap(~book, ncol=1, scale="free_y", strip.position = "top") +
+  labs(title = "Avatar: The Last Airbender", 
+       subtitle = "IMDb Chapter Ratings Per Book",
+       caption = "\nVisualisation: @JaredBraggins | Source: (appa) R Package",
+       y = 'Chapter',
+       x = "Rating")
+
+
 #Export plot
-ggsave("Avatar.png", dpi = 700, width = 25, height = 29, units = "cm")
+ggsave("Avatar.png", p2, dpi = 700, width = 25, height = 29, units = "cm")
