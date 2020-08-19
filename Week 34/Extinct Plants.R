@@ -4,6 +4,7 @@
 #Load packages
 library(tidyverse)
 library(waffle)
+library(ggtext)
 library(here)
 library(patchwork)
 library(extrafont)
@@ -33,7 +34,7 @@ threat_data <-threat_data %>%
   select(`threat type`, pct) %>% 
   group_by(`threat type`) %>% 
   summarise(pct = sum(pct)) %>% 
-  mutate(`threat type` = fct_reorder(`threat type`, pct, sum, .desc=F)) 
+  mutate(`threat type` = fct_reorder(`threat type`, pct, sum, .desc=F))  
   
 #Set theme
 font_family <- 'Century Gothic'
@@ -66,7 +67,6 @@ theme_style <- theme(text = element_text(family = font_family),
 theme_set(theme_classic() + theme_style)
 
 cols <- c("#EF2D56", "#3A6EA5", "#F35B04","#EEE82C", "#35CE8D","#2BD9FE")
-
 
 col_filter <- "#D7CDCC"
 r <- 4
@@ -114,7 +114,7 @@ p6 <- ggplot(threat_data, aes(fill = `threat type`, values = pct))  +
        </span>") +
   theme(plot.title = element_markdown(hjust = .1, size = 10, colour = text_colour))
 
-#Commercial Development
+#Natural System Modifications 
 p7 <- ggplot(threat_data, aes(fill = `threat type`, values = pct))  +
   geom_waffle(n_rows = 10, size = .5, color=NA, 
               radius = unit(r, "pt"), height = 0.8, 
@@ -125,12 +125,12 @@ p7 <- ggplot(threat_data, aes(fill = `threat type`, values = pct))  +
                              "#EEE82C",
                              alpha(col_filter, 1/3),
                              alpha(col_filter, 1/3))) +
-  labs(title = "**Commercial Development**
-       <span style='font-size:20pt;'>8%
+  labs(title = "**Natural System Modifications**
+       <span style='font-size:20pt;'>16%
        </span>") +
   theme(plot.title = element_markdown(hjust = .1, size = 10, colour = text_colour))
 
-#Energy Production & Mining 
+#Other
 p2 <- ggplot(threat_data, aes(fill = `threat type`, values = pct))  +
   geom_waffle(n_rows = 10, size = .5, color=NA, 
               radius = unit(r, "pt"), height = 0.8, 
@@ -141,12 +141,12 @@ p2 <- ggplot(threat_data, aes(fill = `threat type`, values = pct))  +
                              alpha(col_filter, 1/3), 
                              alpha(col_filter, 1/3),
                              alpha(col_filter, 1/3))) +
-  labs(title = "**Energy Production & Mining**
-       <span style='font-size:20pt;'>7%
+  labs(title = "**Other**
+       <span style='font-size:20pt;'>14%
        </span>") +
   theme(plot.title = element_markdown(hjust = .1, size = 10, colour = text_colour))
 
-#Natural System Modifications 
+#Commercial Development
 p3 <- ggplot(threat_data, aes(fill = `threat type`, values = pct))  +
   geom_waffle(n_rows = 10, size = .5, color=NA, 
               radius = unit(r, "pt"), height = 0.8, 
@@ -157,12 +157,12 @@ p3 <- ggplot(threat_data, aes(fill = `threat type`, values = pct))  +
                              alpha(col_filter, 1/3), 
                              alpha(col_filter, 1/3), 
                              alpha(col_filter, 1/3))) +
-  labs(title = "**Natural System Modifications**
-       <span style='font-size:20pt;'>16%
+  labs(title = "**Commercial Development**
+       <span style='font-size:20pt;'>8%
        </span>") +
   theme(plot.title = element_markdown(hjust = .1, size = 10, colour = text_colour))
 
-#Other
+#Energy Production & Mining 
 p4 <- ggplot(threat_data, aes(fill = `threat type`, values = pct))  +
   geom_waffle(n_rows = 10, size = .5, color=NA, 
               radius = unit(r, "pt"), height = 0.8, 
@@ -173,16 +173,14 @@ p4 <- ggplot(threat_data, aes(fill = `threat type`, values = pct))  +
                              alpha(col_filter, 1/3), 
                              alpha(col_filter, 1/3), 
                              alpha(col_filter, 1/3))) +
-  labs(title = "**Other**
-       <span style='font-size:20pt;'>14%
+  labs(title = "**Energy Production & Mining**
+       <span style='font-size:20pt;'>7%
        </span>") +
   theme(plot.title = element_markdown(hjust = .1, size = 10, colour = text_colour))
-
 
 final <- (((p1 + plot_layout(widths = c(1, 2), nrow = 1)) | (p2 + p3 + p4 + plot_layout(nrow = 1)) / (p5 + p6 + p7 + plot_layout(nrow = 1))
          + plot_layout(guides = 'keep'))) + 
   plot_annotation(caption = "Visualisation: @JaredBraggins | Source: IUCN Red List")
-
 
 #Export plot
 ggsave("Extinct Plants.png", final, width = 17, height = 8, type = "cairo")
