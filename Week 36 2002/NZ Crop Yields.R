@@ -1,6 +1,5 @@
 ## Tidy Tuesday Week 36 - Global Crop Yields
 ## Data Source: Our World in Data
-## Colour palette: https://coolors.co/9ba2ff-b26e63-453823-81b29a-f2cc8f
 
 #Load packages
 library(tidyverse)
@@ -59,12 +58,10 @@ theme_style <- theme(text = element_text(family = font_family1),
 theme_set(theme_classic() + theme_style)
 
 #Set colour palette
-cols <- c("#FFFFB3", "#6C698D", "#61988E", "#6E0D25", "#2E4057", "#B4ADEA")
-#cols <- c("#F8EA1B", "#E77C29", "#A6C839", "#A1DAF7", "#A877B2", "#F087B6")
-
+cols <- c("#F3D2B3", "#F2B8A2", "#F38C8D", "#5E9DB8", "#ADA296", "#2C5F72")
 
 #Plot data
-ggplot(NZ_yield, aes(year, crop_production, alpha = 05, fill = factor(crop))) +
+ggplot(NZ_yield, aes(year, crop_production, fill = factor(crop))) +
   geom_stream(method = "raw", bw = .7) +
   scale_fill_manual(name = "crop", values = cols) +
   scale_x_continuous(breaks = seq(1960, 2020, 10)) +
@@ -101,7 +98,6 @@ ggplot(NZ_yield, aes(year, crop_production, alpha = 05, fill = factor(crop))) +
        subtitle = "New Zealand Crop Yields (tonnes per hectare) Since 1961",
        caption = "Visualisation: @JaredBraggins | Sources: Our World in Data, Te Ara") +
   guides(fill = guide_legend(nrow = 1))
-  
 
 #Export plot
 ggsave("NZ Crops.png", dpi = 700, width = 15, height = 9)
