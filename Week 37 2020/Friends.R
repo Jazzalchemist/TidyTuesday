@@ -11,7 +11,6 @@ library(patchwork)
 library(friends)
 library(extrafont)
 
-
 #Import data
 tuesdata <- tidytuesdayR::tt_load('2020-09-08')
 tuesdata <- tidytuesdayR::tt_load(2020, week = 37)
@@ -107,7 +106,6 @@ p1 <- f_data2 %>%
   geom_text(aes(label = paste(emotion, " "), y = 0), family = font_family2, color = text_colour, hjust = 1) +
   theme(axis.text.x = element_text(size = 10, colour = text_colour)) +
   coord_polar(theta = "y", start = 0, clip = "off")
-
 
 #Plot each season
 p2 <- ggplot(f_data, aes(emotion, n, fill = factor(highlight))) +
