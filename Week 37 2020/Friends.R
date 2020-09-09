@@ -134,7 +134,6 @@ p2 <- p2 +
   geom_label(data = S4_text, label = "Joyful was the largest\nemotion, and Mad\nsaw a decrease on\nS3. Powerful was\ngradually growing\nsince S1",
             size = 3, color = text_colour, family = font_family2, hjust = "center", fill = background)
 
-
 #Combine charts
 final <- (p1 + p2) +
   plot_annotation(title = "The \xb7 One \xb7 with \xb7 the \xb7 Emotions",
