@@ -1,5 +1,5 @@
 ## Tidy Tuesday Week 18 - CEO Departures
-## Data Source: Gentry et al. by way of DataIsPlural
+## Data Source: Gentry et al.
 
 # Load packages
 library(tidyverse)
