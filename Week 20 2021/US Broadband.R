@@ -85,7 +85,7 @@ ggplot() +
           aes(fill = broadband_usage),
           color = "#738290", 
           size = 0.05) +
-   scale_fill_gradient2(low = '#48cae4', high = '#023e8a',
+   scale_fill_gradient2(low = '#00b4d8', high = '#023e8a',
                         breaks = c(.2,.4,.6,.8), 
                         labels = c("20%","40%","60%", "80%"),
                         midpoint = 0.3) +
