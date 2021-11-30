@@ -4,8 +4,6 @@
 # Load packages
 library(tidyverse)
 library(here)
-library(scales)
-library(lubridate)
 library(extrafont)
 
 # Import data
